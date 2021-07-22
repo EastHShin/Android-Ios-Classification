@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Android-Ios Classification Model</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<script type="text/javascript">
+    let time_obj = undefined;
+    let flag = undefined;
+
+    window.onload = () => {
+        time_obj = document.getElementById("timer");
+        flag = false;
+    };
+
+    function double_submit_check() {
+        if (flag) {
+            console.log("double");
+            return true;
+        } else {
+            flag = true;
+            return false;
+        }
+    }
+
+    function send_req() {
+        if (double_submit_check()) {
+            return;
+        }
+
+        let question = document.getElementById("question").value;
+
+        if (question == '') {
+            document.getElementById('warning').innerText = 'Please fill the text!';
+            flag = false;
+            return;
+        }
+        const formData = new FormData();
+        const url = "/classification";
+        let start = 0;
+
+        formData.append('question', question);
+
+        // timer
+        timer = setInterval(() => {
+            start += 1;
+            time_obj.innerText = `${start / 10} 's`;
+        }, 100);
+
+        fetch(url, {method: 'POST', body: formData})
+            .then(response => {
+                if (response.status == 200) {
+                    return response.json();
+                } else {
+                    clearInterval(timer);
+                    flag = false;
+                }
+            }).catch(err => {
+            clearInterval(timer);
+            flag = false;
+            document.getElementById('warning').innerText = err;
+        }).then(data => {
+            let ans;
+            const label = data[0]['label']
+            if (label == 'LABEL_0')
+                ans = 'Android'
+            else if(label == 'LABEL_1')
+                ans = 'IOS'
+
+            const result = document.getElementById('result');
+            result.innerHTML = ans
+            clearInterval(timer);
+            time_obj.innerText = 'Done!';
+            flag = false;
+        }).catch(err => {
+            clearInterval(timer);
+            flag = false;
+            document.getElementById('warning').innerText = err;
+        });
+    }
+</script>
+<body>
+<div class="styles">
+    <style>
+
+        .jumbotron {
+            background-image: url('../static/images/iphone-3506067_1280.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+        }
+        .sample{
+            color: aliceblue;
+        }
+        .classification{
+            color: aliceblue;
+        }
+        #header {
+            font-family: "Diwan Kufi";
+            color: firebrick;
+            text-align: center;
+        }
+
+        #exQuestion {
+
+            border-style: solid;
+            border-width: 2px;
+            background-color: antiquewhite;
+            padding: 12px;
+            word-break: break-all;
+            border-color: black;
+            border-radius: 10px;
+            color: black;
+        }
+
+        #exClassification {
+            width: 100px;
+            border-style: solid;
+            border-width: 2px;
+            background-color: antiquewhite;
+            padding: 5px;
+            word-break: break-all;
+            border-color: black;
+            border-radius: 10px;
+            color: black;
+            text-align: center;
+        }
+
+
+        #question {
+            width: 70%;
+            height: 100px;
+        }
+
+        #timer {
+            color: red;
+        }
+        .resultBox{
+            color: aliceblue;
+        }
+        .Labelbox{
+            width: 100px;
+            height: 40px;
+            border-style: solid;
+            background-color: antiquewhite;
+            padding: 5px;
+            border-color: black;
+            border-radius: 10px;
+            text-align: center;
+        }
+        #result{
+            color: red;
+        }
+
+    </style>
+</div>
+<div class="container">
+    <div class="jumbotron">
+        <div class="intro">
+            <br>
+            <!-- Project title -->
+            <h1 id="header"> Android-Ios Classification Model</h1>
+            <p style="color: aliceblue">Try using the Classification model as a BERT model trained on Question Classification Android or Ios Data
+                from <a href="https://www.kaggle.com/xhlulu/question-classification-android-or-ios" target="_blank">Kaggle</a>
+            </p>
+            <p style="color: aliceblue">Open API : <a href="">On Ainize</a></p>
+        </div>
+
+        <hr width="90%">
+
+        <div class="sample">
+            <h3><label>Example</label></h3>
+            <h5><label>Question</label></h5>
+            <label id="exQuestion">I recently upgraded from a Galaxy S3 on which ABP worked flawlessly. To install and
+                configure it on my Galaxy S3 I used this guide</label>
+            <h5><label>Classification</label></h5>
+            <label id="exClassification">Android</label>
+        </div>
+        <br>
+        <hr width="90%">
+
+        <div class="classification">
+            <h2>Try it!</h2><br>
+            <h4><label>Question</label></h4>
+            <div><textarea type="text" id="question"></textarea></div>
+            <button type="submit" class="btn btn-secondary" id="button" onclick="send_req()">Submit</button>
+            <label style="color: azure">Timer:&nbsp</label><label id="timer">0.0</label><br>
+            <b><label id="warning" style="color: red"></label> </b>
+        </div>
+
+        <hr width="90%">
+
+        <div class="resultBox">
+            <h3><label>Result</label></h3>
+            <div class="Labelbox">
+                <label id="result"></label>
+            </div>
+        </div>
+        <br>
+        <hr width="50%"/>
+    </div>
+</div>
+</body>
+</html>
