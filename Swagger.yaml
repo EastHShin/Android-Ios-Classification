@@ -1,0 +1,50 @@
+openapi: 3.0.3
+
+info:
+
+  version: "1.0.0"
+  title: "Android-Ios Question Classification model"
+  contact:
+    email: "easthshin@comcom.ai"
+  license:
+    name: "CC BY-SA 4.0"
+    url: "https://creativecommons.org/licenses/by-sa/4.0/"
+  description: "Try using the Android-Ios Question Classification model as a BERT model trained on Android-Ios classification Data from [Kaggle](https://www.kaggle.com/xhlulu/question-classification-android-or-ios)"
+    
+    
+servers:
+  - url: "https://main-android-ios-classification-east-h-shin.endpoint.ainize.ai/"
+
+paths:
+  /classification:
+    post:
+      summary: Get Response
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+              required:
+                - question
+      responses:
+        '200':
+          description: "Succesful Response"
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: "Bad Request Error"
+        '429':
+          description: "Too many requests"
+        '500':
+          description: "Server-side Error"
+
+
+externalDocs:
+  description: "Ainize"
+  url: "https://ainize.ai/explore"
